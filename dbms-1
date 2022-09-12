@@ -1,0 +1,344 @@
+
+Question 1: 
+Create tables for the following schema: SAILOR (sid: integer, sname: string, rating: integer, age: real) BOAT (bid: integer, bname:string, color:string) RESERVES (sid: integer, bid: integer, day: date)
+
+create table sailor(sid int primary key,sname varchar(20),rating int,age int);
+commit;
+create table boat(bid int primary key,bname varchar(20),color varchar(20));
+commit;
+create table reserves(sid int references sailor(sid),bid int references boat(bid),day date);
+commit;
+
+insert into sailor values(1,'Shyam',6,32);
+insert into sailor values(2,'Ram',8,22);
+insert into sailor values(3,'Raj',5,45);
+insert into sailor values(4,'Manu',9,55);
+insert into sailor values(5,'Riya',7,60);
+insert into sailor values(6,'BuggB',8,33);
+
+insert into boat values(101,'B1','red');
+insert into boat values(102,'B2','red');
+insert into boat values(103,'B3','green');
+insert into boat values(104,'B4','orange');
+insert into boat values(105,'B5','blue');
+
+insert into reserves values(1,101,'2000-02-01');
+insert into reserves values(1,103,'2001-02-01');
+insert into reserves values(2,102,'2002-02-01');
+insert into reserves values(3,104,'2003-02-01');
+
+select sname as 'Sailor name',age from sailor;
+
+select * from sailor where rating>7;
+
+select sid from reserves where bid in (select bid from boat where color='red');
+
+select color from sailor, boat, reserves where sailor.sid=reserves.sid and boat.bid=reserves.bid and sname='Shyam';
+
+Delete from boat where boat.bid not in(Select reserves.bid from reserves);
+Select * from boat;
+
+Select sname from sailor,boat,reserves where sailor.sid=reserves.sid and boat.bid=reserves.bid and boat.bid=103;
+
+Select sname from sailor,boat,reserves where sailor.sid=reserves.sid and boat.bid=reserves.bid and color='red';
+
+Select age from sailor where sname like 'B___%b';
+
+Select sname, age from sailor where age=(Select max(age) from sailor);
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Question 2: 
+Create tables for the following schema: 
+SUPPLIER(sid: integer, sname: string, address: string) 
+PART(pid: integer, pname: string, color: string) 
+CATALOG(sid: integer, pid: integer, cost: real)
+
+create table supplier(sid int primary key,sname varchar(20),address varchar(20));
+create table part(pid int primary key,pname varchar(20),color varchar(20));
+create table catalog(sid int references supplier(sid),pid int references part(pid),cost int);
+
+insert into supplier values(1,'Raj','Patna');
+insert into supplier values(2,'Riya','Surat');
+insert into supplier values(3,'Ram','Bangalore');
+insert into supplier values(4,'Shyam','Mangalore');
+insert into supplier values(5,'Manu','Shimla');
+
+insert into part values(101,'P1','red');
+insert into part values(102,'P2','green');
+insert into part values(103,'P3','red');
+insert into part values(104,'P4','orange');
+insert into part values(105,'P5','blue');
+
+insert into catalog values(1,101,500);
+insert into catalog values(1,102,400);
+insert into catalog values(2,103,300);
+insert into catalog values(3,104,300);
+
+Select sid,sname from supplier;
+
+Select * from catalog where cost=(Select max(cost) from catalog);
+
+Select pname from part,catalog where part.pid=catalog.pid;
+
+select distinct C.sid from part P,catalog C where P.color='red' 
+and exists (select P2.pid from part P2,catalog C2 where P2.color='green' and C2.sid=C.sid and P2.pid=C2.pid);
+
+Delete from part where pid=105;
+
+Select sid from part,catalog where color In ('red','green') and catalog.pid=part.pid;
+
+Select * from supplier where address='bangalore';
+
+Select sid from catalog,part where part.pid=catalog.pid and color='red';
+
+select distinct C.sid,cost from part P,catalog C where P.color='red' and cost=(select max(cost) from catalog) 
+and exists (select P2.pid from part P2,catalog C2 where P2.color='green' and C2.sid=C.sid and P2.pid=C2.pid);
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Question 3:
+Create tables for the following schema:
+SALESMAN (Salesman_id:integer, Name:string, City:string, Commission:integer)
+CUSTOMER (Customer_id:integer, Cust_Name:string, City:string)
+ORDERS (Ord_No:integer, Purchase_Amt:real, Ord_Date:date, Customer_id:integer, Salesman_id:integer)
+
+create table salesman(sid int primary key,sname varchar(20),scity varchar(20),com int);
+create table customer(cid int primary key,cname varchar(20),ccity varchar(20));
+create table orders(ono int,amt int,odate date,cid int references customer(cid),sid int references salesman(sid));
+
+insert into salesman values(1,'sashi','bokara',6000);
+insert into salesman values(2,'anup','bangalore',5000);
+insert into salesman values(3,'cinds','kolkata',15000);
+insert into salesman values(4,'dijak','mumbai',8000);
+insert into salesman values(5,'biak','mumbai',6000);
+
+insert into customer values(101,'abhijeet','mumbai');
+insert into customer values(102,'sarbjeet','bokara');
+insert into customer values(103,'bipin','bangalore');
+insert into customer values(104,'cipin','kolkata');
+insert into customer values(105,'dipin','mumbai');
+
+insert into orders values(20,2000,'2017-11-15',101,1);
+insert into orders values(21,1000,'2019-05-06',102,2);
+insert into orders values(22,2500,'2020-02-23',103,3);
+insert into orders values(23,800,'2010-09-27',104,4);
+insert into orders values(24,1500,'2014-06-14',105,5);
+
+select cid,cname from customer;
+
+select * from salesman where com=(Select max(com) from salesman);
+
+Select * from orders order by amt desc;
+
+select distinct cname,ccity from customer,salesman where ccity=scity;
+
+delete from orders where odate<'2018-01-01';
+select * from orders;
+
+Select sname from salesman,customer,orders 
+where salesman.sid=orders.sid and customer.cid=orders.cid;
+
+Select sname from salesman where com>=(Select SUM(com)*0.25 from salesman);
+
+select cname,amt from customer,orders where customer.cid=orders.cid;
+
+Select sname,sid from salesman where com>10000;
+
+
+Question 4:
+Create the following Tables:
+
+create table location(locationid int primary key, regionalgroup varchar(20));
+create table department(departmentid int primary key, name varchar(20), locationid int references location(locationid));
+create table job(jobid int primary key, func varchar(20));
+create table employee(employeeid int primary key,lastname varchar(20),firstname varchar(20),
+middlename varchar(20),jobid int references job(jobid),managerid int,
+hiredate date,salary int,comm int,departmentid int references location(locationid));
+
+insert into location values(123,"DALLAS");
+insert into location values(124,"CHICAGO");
+insert into location values(167,"BOSTON" );
+insert into location values(122,"NEW YORK" );
+
+insert into department values(10,"ACCOUNTING",122);
+insert into department values(20,"RESEARCH",124);
+insert into department values(30,"SALES",123);
+insert into department values(40,"OPERATIONS",167);
+
+insert into job values(667,'CLERK');
+insert into job values(668,'STAFF');
+insert into job values(669,'ANALYST');
+insert into job values(670,'SALESPERSON');
+insert into job values(671,'MANAGER');
+insert into job values(672,'PRESIDENT');
+
+insert into employee values(7839,"MEGAN","JOHN","S",672,NULL,'2014-12-12',5500,NULL,30);
+insert into employee values(7505,"DOYLE","JEAN","K",671,7839,'2015-04-04',2850,NULL,30);
+insert into employee values(7521,"WARK","CYNTHIA","D",670,7505,'15-02-22',1250,500,30);
+insert into employee values(7507,"BAKER","LESLIE","D",671,7839,'2015-06-10',220,NULL,40);
+insert into employee values(7499,"ALLEN","KEVIN","J",670,7507,'2017-02-20',1600,300,30);
+insert into employee values(7369,"SMITH","JOHN","Q",667,7521,'2018-12-17',800,NULL,20);
+insert into employee values(7506,"DENIS","LYNN","S",671,7839,'2015-05-15',2750,NULL,30);
+
+Order by Clause:
+
+select employeeid, lastname from employee order by employeeid;
+
+select employeeid, firstname, middlename, lastname from employee order by salary desc;
+
+select * from employee order by lastname asc,salary desc;
+
+select * from employee order by lastname asc, departmentid desc;
+
+Group By & Having Clause: 
+select department.departmentid,name,count(employeeid) as 'no of employees' from employee,department 
+where employee.departmentid=department.departmentid
+group by employee.departmentid;
+
+select employee.departmentid,name,max(salary) as Max_sal,min(salary) as Min_sal,avg(salary) as Avg_sal from employee,department 
+where employee.departmentid=department.departmentid 
+group by employee.departmentid;
+
+Select job.jobid,func,max(salary) as Max_sal,min(salary) as Min_sal,avg(salary) as Avg_sal from employee,job 
+where employee.jobid=job.jobid 
+group by employee.jobid;
+
+select month(hiredate) as Month, count(employeeid) as no_of_employees from employee 
+group by month(hiredate) 
+order by count(employeeid);
+
+select month(hiredate) as Month, year(hiredate) as Year,count(employeeid) from employee 
+group by year(hiredate),month(hiredate) 
+order by year(hiredate),month(hiredate);
+
+select departmentid from employee 
+group by departmentid 
+having count(employeeid)>=4;
+
+Select count(employeeid) from employee where month(hiredate)=1;
+
+Select count(employeeid) from employee where month(hiredate) in (1,9);
+
+select count(employeeid) from employee where year(hiredate)=1985;
+
+select month(hiredate),count(employeeid) from employee 
+where year(hiredate)=1985 and month(hiredate) between 1 and 12 
+group by month(hiredate);
+
+select count(employeeid) from employee 
+where year(hiredate)=1985 and month(hiredate)=3;
+
+select departmentid from employee 
+where month(hiredate)=4 and year(hiredate) = 1985 
+group by departmentid 
+having count(employeeid)>=3;
+Sub-Queries :
+select employeeid, firstname,middlename ,lastname, salary from employee 
+where salary=(select max(salary) from employee);
+
+select employeeid, firstname,middlename ,lastname from employee,department 
+where employee.departmentid=department.departmentid and name="SALES";
+
+select employeeid, firstname,middlename ,lastname from employee,job 
+where employee.jobid=job.jobid and func="CLERK";
+
+select employeeid, firstname,middlename ,lastname from employee,department,location 
+where employee.departmentid=department.departmentid and department.locationid=location.locationid 
+and regionalgroup="NEW YORK";
+
+select count(employeeid)from employee,department 
+where employee.departmentid=department.departmentid and name="SALES";
+
+update employee set salary= 1.1*salary 
+where jobid=(select jobid from job where func="CLERK");
+
+delete from employee 
+where departmentid=(select departmentid from department where name="ACCOUNTING");
+
+select employeeid, firstname ,middlename ,lastname ,salary from employee 
+where salary=(select max(salary) from employee where salary<(select max(salary) from employee));
+
+select employeeid, firstname ,middlename ,lastname ,salary from employee 
+order by salary desc limit 2,1;
+Sub-Query operators: (ALL, ANY, SOME, EXISTS) :
+Select employeeid,firstname ,middlename ,lastname ,salary from employee 
+where salary> all(select salary from employee where departmentid=30);
+
+Select employeeid,firstname ,middlename ,lastname ,salary from employee 
+where salary> all(select min(salary) from employee where departmentid=30);
+
+select departmentid,name from department 
+where departmentid not in(select departmentid from employee);
+
+select departmentid,name from department 
+where departmentid not in(select departmentid from employee);
+
+Co-Related Sub Queries: 
+select * from employee e 
+where salary>(Select  avg(salary) from employee f  where e.departmentid=f.departmentid);
+
+
+
+Joins
+Simple join 
+
+select employeeid,firstname ,middlename ,lastname ,employee.departmentid,name as Department from employee,department 
+where employee.departmentid=department.departmentid;
+
+select employeeid,firstname ,middlename ,lastname ,func as Job 
+from employee natural join job;
+
+select employeeid,firstname ,middlename ,lastname, name as Departmentname,regionalgroup 
+from employee natural join department natural join location;
+
+select department.departmentid ,name as Departmentname,count(employeeid) as No_of_employees from employee 
+natural join department 
+group by department.departmentid;
+
+select count(employeeid) as no_of_employees 
+from employee natural join department where name="SALES";
+
+select count(*) ,department.departmentid,name from employee ,department where employee.departmentid=department.departmentid  
+group by name having count(*)>=5 order by name;
+
+select func,count(*) from employee,job 
+where employee.jobid=job.jobid group by func;
+
+select count(employeeid) as no_of_employees 
+from employee natural join department natural join location 
+where regionalgroup="NEW YORK";
+
+Self-Join: 
+select e1.employeeid,e1.firstname as emp_firstname,e1.middlename as emp_middlename,e1.lastname as emp_lastname,
+e2.employeeid as managerid,e2.firstname as man_firstname,e2.middlename as man_middlename,e2.lastname as man_lastname 
+from employee e1,employee e2 where e1.managerid=e2.employeeid;
+
+select e1.employeeid,e1.firstname as emp_firstname,e1.middlename as emp_middlename,e1.lastname as emp_lastname,
+e2.employeeid as managerid,e2.firstname as man_firstname,e2.middlename as man_middlename,e2.lastname as man_lastname 
+from employee e1,employee e2 where e1.managerid=e2.employeeid and e1.salary>e2.salary;
+
+select managerid,count(employeeid) as no_employees from employee group by managerid;
+
+OUTER JOIN:
+
+select * from employee e , department d  
+where e.departmentid=d.departmentid group by e.departmentid;
+
+select employeeid,firstname as Firstname,middlename as Middlename,lastname as Lastname,name as Department 
+from employee natural join department where name in("SALES","OPERATION");
+
+SET OPERATORS:
+
+Select func from job where jobid in (Select jobid from employee where departmentid=(select departmentid from department where name='SALES')) 
+union 
+Select func from job where jobid in (Select jobid from employee where departmentid=(select departmentid from department where name='ACCOUNTING'));
+
+select employee.jobid,func as job from employee,department,job where name in("SALES","ACCOUNTING") 
+and employee.departmentid=department.departmentid and employee.jobid=job.jobid;
+
+select employee.jobid,func as Job from employee,job,department 
+where employee.jobid=job.jobid and employee.departmentid=department.departmentid and name="ACCOUNTING" 
+and func in(select func from employee,job,department where department.departmentid=employee.departmentid and employee.jobid=job.jobid and name="RESEARCH") 
+order by job;
+
+
+
